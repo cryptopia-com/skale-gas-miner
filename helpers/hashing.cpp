@@ -38,7 +38,8 @@ namespace Cryptopia
             hexDigest.begin(),
             hexDigest.end(),
             hexDigest.begin(),
-            [](unsigned char c) {
+            [](unsigned char c) 
+            {
                 return std::tolower(c);
             });
 

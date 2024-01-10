@@ -19,7 +19,8 @@ namespace Cryptopia
         std::string cleanHex = hex;
 
         // Remove "0x" prefix if present
-        if (cleanHex.size() > 1 && cleanHex.substr(0, 2) == "0x") {
+        if (cleanHex.size() > 1 && cleanHex.substr(0, 2) == "0x") 
+        {
             cleanHex = cleanHex.substr(2);
         }
 

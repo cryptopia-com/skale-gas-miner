@@ -105,14 +105,16 @@ namespace Cryptopia
 
         stopSource_ = std::stop_source{};
         unsigned int threadCount = std::thread::hardware_concurrency();
-        if (maxThreads > 0 && maxThreads < threadCount) {
+        if (maxThreads > 0 && maxThreads < threadCount) 
+        {
             threadCount = maxThreads;
         }
 
         miningThreads_.resize(threadCount);
         auto localHashRates = std::make_unique<std::atomic<unsigned long long>[]>(threadCount);
 
-        for (unsigned int i = 0; i < threadCount; i++) {
+        for (unsigned int i = 0; i < threadCount; i++) 
+        {
             miningThreads_[i] = std::thread(
                 &SkaleGasMiner::DoMineGas, this, amount, numerator, precomputed, std::ref(localHashRates[i]), stopSource_.get_token());
         }
@@ -120,13 +122,16 @@ namespace Cryptopia
         std::thread measureHashRateThread = std::thread(
             &SkaleGasMiner::SetHashRate, this, localHashRates.get(), threadCount, hashRateCallback, stopSource_.get_token());
 
-        for (auto& thread : miningThreads_) {
-            if (thread.joinable()) {
+        for (auto& thread : miningThreads_) 
+        {
+            if (thread.joinable()) 
+            {
                 thread.join();
             }
         }
 
-        if (measureHashRateThread.joinable()) {
+        if (measureHashRateThread.joinable()) 
+        {
             measureHashRateThread.join();
         }
 
@@ -134,10 +139,12 @@ namespace Cryptopia
         hashRate_ = 0;
 
         std::string result = GetResult();
-        if (result.empty()) {
+        if (result.empty()) 
+        {
             resultCallback(false, "", "Aborted");
         }
-        else {
+        else 
+        {
             resultCallback(true, result.c_str(), "");
         }
     }
@@ -165,9 +172,7 @@ namespace Cryptopia
             std::string hexString;
             CryptoPP::ArraySource(candidateBytes, sizeof(candidateBytes), true,
                 new CryptoPP::HexEncoder(
-                    new CryptoPP::StringSink(hexString)
-                )
-            );
+                    new CryptoPP::StringSink(hexString)));
 
             // Convert to lowercase
             std::transform(hexString.begin(), hexString.end(), hexString.begin(), ::tolower);
@@ -235,8 +240,10 @@ namespace Cryptopia
      * Stops all active mining threads.
      * This function signals all threads to stop and resets the mining state.
      */
-    void SkaleGasMiner::Stop() {
-        if (!isMining_) {
+    void SkaleGasMiner::Stop() 
+    {
+        if (!isMining_) 
+        {
             return;
         }
 
