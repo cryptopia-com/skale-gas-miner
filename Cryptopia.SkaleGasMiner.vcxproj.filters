@@ -54,4 +54,7 @@
       <Filter>Source Files\helpers</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
 </Project>

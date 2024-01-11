@@ -2,9 +2,15 @@
 
 Welcome to the `Cryptopia.SkaleGasMiner` project, a solution for gas mining in Unity3D on the Skale network. This project encapsulates the logic required for efficient mining, offering a minimal API for managing mining processes.
 
+## About SKALE
+
+[SKALE](https://skale.space/) is a limitlessly scalable, fast, on-demand blockchain network with zero gas fees, allowing quick deployment of interoperable EVM-compatible chains without compromising security or decentralization.
+
+SKALE is a fully decentralized, open-source, community-owned network.
+
 ## About Cryptopia
 
-Cryptopia is a multi-blockchain multiplayer RPG and strategy game build in Unity3D. The game offers a gasless gaming experience on Skale Network using a custom build-in native wallet solution.
+[Cryptopia](https://cryptopia.com/) is a fully decentralized multiplayer RPG and strategy game, created in Unity3D. Running on the SKALE Network as its default blockchain, it offers a gasless gaming experience with a built-in native wallet and gas mining solutions. This game uniquely blends RPG elements with strategic gameplay in a blockchain-based environment.
 
 ## Building the DLL
 
