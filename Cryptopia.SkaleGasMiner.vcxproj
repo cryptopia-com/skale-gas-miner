@@ -149,7 +149,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
     <ClInclude Include="helpers\convert.h" />
     <ClInclude Include="helpers\hashing.h" />
     <ClInclude Include="pch.h" />
