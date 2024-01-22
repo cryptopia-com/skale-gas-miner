@@ -4,7 +4,6 @@
 #include <atomic>
 #include <vector>
 #include <thread>
-#include <stop_token>
 #include "cryptopp/integer.h"
 
 #ifdef SKALEGASMINER_EXPORTS
@@ -92,7 +91,7 @@ namespace Cryptopia
         mutable std::mutex resultMutex_;
         std::string result_;
         std::atomic<bool> resultFound_;
-        std::stop_source stopSource_;
+        std::atomic<bool> stopRequested_;
 
         /**
          * Constructor for the SkaleGasMiner class.
@@ -137,9 +136,8 @@ namespace Cryptopia
          * @param numerator The numerator for the mining calculation.
          * @param precomputed Precomputed value for the mining algorithm.
          * @param localHashRate Atomic variable to store the hash rate calculated by this thread.
-         * @param stopToken Token to signal the thread to stop running.
          */
-        void DoMineGas(const unsigned long long amount, CryptoPP::Integer numerator, CryptoPP::Integer precomputed, std::atomic<unsigned long long>& localHashRate, std::stop_token stopToken);
+        void DoMineGas(const unsigned long long amount, CryptoPP::Integer numerator, CryptoPP::Integer precomputed, std::atomic<unsigned long long>& localHashRate);
         
         /**
          * Calculates and updates the overall hash rate of the mining operation.
@@ -149,8 +147,7 @@ namespace Cryptopia
          * @param localHashRates Array of hash rates from each mining thread.
          * @param threadCount The number of threads involved in the mining process.
          * @param callback The callback function to report the hash rate.
-         * @param stopToken Token to signal the thread to stop running.
          */
-        void SetHashRate(std::atomic<unsigned long long>* localHashRates, unsigned int threadCount, HashRateDelegate callback, std::stop_token stopToken);
+        void SetHashRate(std::atomic<unsigned long long>* localHashRates, unsigned int threadCount, HashRateDelegate callback);
     };
 }

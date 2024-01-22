@@ -32,7 +32,7 @@ namespace Cryptopia
      * As part of the singleton pattern, this constructor is private to prevent direct instantiation.
      */
     SkaleGasMiner::SkaleGasMiner()
-        : isMining_(false), hashRate_(0), resultFound_(false) {}
+        : isMining_(false), hashRate_(0), resultFound_(false), stopRequested_(false) {}
 
     /**
      * Destructor for cleaning up resources.
@@ -96,6 +96,7 @@ namespace Cryptopia
         isMining_ = true;
         hashRate_ = 0;
         resultFound_ = false;
+        stopRequested_ = false;
         SetResult("");
 
         CryptoPP::Integer numerator((CryptoPP::Integer::Power2(256) - 1) / difficulty);
@@ -103,7 +104,6 @@ namespace Cryptopia
         CryptoPP::Integer fromAddressHash(GetSoliditySha3(HexToByteArray(fromAddress)).c_str());
         CryptoPP::Integer precomputed = nonceHash ^ fromAddressHash;
 
-        stopSource_ = std::stop_source{};
         unsigned int threadCount = std::thread::hardware_concurrency();
         if (maxThreads > 0 && maxThreads < threadCount) 
         {
@@ -116,11 +116,11 @@ namespace Cryptopia
         for (unsigned int i = 0; i < threadCount; i++) 
         {
             miningThreads_[i] = std::thread(
-                &SkaleGasMiner::DoMineGas, this, amount, numerator, precomputed, std::ref(localHashRates[i]), stopSource_.get_token());
+                &SkaleGasMiner::DoMineGas, this, amount, numerator, precomputed, std::ref(localHashRates[i]));
         }
 
         std::thread measureHashRateThread = std::thread(
-            &SkaleGasMiner::SetHashRate, this, localHashRates.get(), threadCount, hashRateCallback, stopSource_.get_token());
+            &SkaleGasMiner::SetHashRate, this, localHashRates.get(), threadCount, hashRateCallback);
 
         for (auto& thread : miningThreads_) 
         {
@@ -157,14 +157,13 @@ namespace Cryptopia
      * @param numerator The numerator for the mining calculation.
      * @param precomputed Precomputed value for the mining algorithm.
      * @param localHashRate Atomic variable to store the hash rate calculated by this thread.
-     * @param stopToken Token to signal the thread to stop running.
      */
-    void SkaleGasMiner::DoMineGas(const unsigned long long amount, CryptoPP::Integer numerator, CryptoPP::Integer precomputed, std::atomic<unsigned long long>& localHashRate, std::stop_token stopToken) 
+    void SkaleGasMiner::DoMineGas(const unsigned long long amount, CryptoPP::Integer numerator, CryptoPP::Integer precomputed, std::atomic<unsigned long long>& localHashRate) 
     {
         CryptoPP::AutoSeededRandomPool rng;
         unsigned char candidateBytes[32];
 
-        while (!stopToken.stop_requested())
+        while (!stopRequested_)
         {
             // Generate randomness
             rng.GenerateBlock(candidateBytes, sizeof(candidateBytes));
@@ -191,8 +190,8 @@ namespace Cryptopia
                 if (!resultFound_)
                 {
                     resultFound_ = true;
+                    stopRequested_ = true;
                     SetResult(IntegerToString(HexToInteger(hexString)));
-                    stopSource_.request_stop();
                 }
 
                 break;
@@ -217,11 +216,10 @@ namespace Cryptopia
      * @param localHashRates Array of hash rates from each mining thread.
      * @param threadCount The number of threads involved in the mining process.
      * @param callback The callback function to report the hash rate.
-     * @param stopToken Token to signal the thread to stop running.
      */
-    void SkaleGasMiner::SetHashRate(std::atomic<unsigned long long>* localHashRates, unsigned int threadCount, HashRateDelegate callback, std::stop_token stopToken) 
+    void SkaleGasMiner::SetHashRate(std::atomic<unsigned long long>* localHashRates, unsigned int threadCount, HashRateDelegate callback) 
     {
-        while (!stopToken.stop_requested()) 
+        while (!stopRequested_)
         {
             unsigned long long hashRate = 0;
             for (unsigned int i = 0; i < threadCount; i++) 
@@ -247,7 +245,7 @@ namespace Cryptopia
             return;
         }
 
-        stopSource_.request_stop();
+        stopRequested_ = true;
         isMining_ = false;
         hashRate_ = 0;
     }
