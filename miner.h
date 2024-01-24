@@ -7,18 +7,32 @@
 #include "cryptopp/integer.h"
 
 #ifdef SKALEGASMINER_EXPORTS
-#define SKALEGASMINER_API __declspec(dllexport)
+    #ifdef _WIN32
+        #define SKALEGASMINER_API __declspec(dllexport)
+    #else
+        #define SKALEGASMINER_API // macOS does not need to define this
+    #endif
 #else
-#define SKALEGASMINER_API __declspec(dllimport)
+    #ifdef _WIN32
+        #define SKALEGASMINER_API __declspec(dllimport)
+    #else
+        #define SKALEGASMINER_API // macOS does not need to define this
+    #endif
+#endif
+
+#ifdef _WIN32
+    #define CALL_CONV _stdcall
+#else
+    #define CALL_CONV // Default calling convention on macOS
 #endif
 
 namespace Cryptopia 
 {
     // Delegate type for reporting hash rate
-    typedef void(_stdcall* HashRateDelegate) (unsigned long long);
+    typedef void(CALL_CONV* HashRateDelegate) (unsigned long long);
 
     // Delegate type for notifying the result of mining
-    typedef void(_stdcall* ResultDelegate) (bool, const char*, const char*);
+    typedef void(CALL_CONV* ResultDelegate) (bool, const char*, const char*);
 
     /**
      * Solution developped by Cryptopia for efficient mining of SKALE gas 

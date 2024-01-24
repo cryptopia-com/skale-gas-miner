@@ -12,7 +12,7 @@ SKALE is a fully decentralized, open-source, community-owned network.
 
 [Cryptopia](https://cryptopia.com/) is a fully decentralized multiplayer RPG and strategy game, created in Unity3D. Running on the SKALE Network as its default blockchain, it offers a gasless gaming experience with a built-in native wallet and gas mining solutions. This game uniquely blends RPG elements with strategic gameplay in a blockchain-based environment.
 
-## Building the DLL
+## Building for Windows
 
 To build the `SkaleGasMiner` DLL, follow these steps:
 
@@ -25,14 +25,75 @@ To build the `SkaleGasMiner` DLL, follow these steps:
     Open the `SkaleGasMiner.sln` file in Visual Studio.
  
  3. **Build the Project:**
-    Set the configuration to `Release` and build the solution. This will generate the `Cryptopia.SkaleGasMiner.dll` file.
+    - Set the configuration to `Release` and build the solution. 
+	- This will generate the `Cryptopia.SkaleGasMiner.dll` file.
  
- ## Using the DLL in Unity
+## Building for macOS
+
+1. **Clone the Repository:**
+    ```bash
+    git clone https://github.com/cryptopia-com/skale-gas-miner.git
+    ```
+
+ 2. **Navigate to the Project Directory:**
+    ```bash
+    cd skale-gas-miner
+    ```
+	
+ 3. **Build for macOS:**
+    - Compile Crypto++ for both `arm64` and `x86_64` architectures.
+    - Use the `lipo` tool to create a universal binary.
+    - Build the `SkaleGasMiner` project in Xcode with `Release` configuration.
+	- This will generate the `Cryptopia.SkaleGasMiner.dylib` file.
+
+### Building Crypto++ for macOS
+
+ To create a universal binary of the Crypto++ library that works on both Intel and Apple Silicon Macs, follow these steps:
  
- To use the `Cryptopia.SkaleGasMiner` DLL in a Unity project, follow these steps:
+1. **Clone the Crypto++ Repository:**
+    ```bash
+    git clone https://github.com/weidai11/cryptopp.git
+    cd cryptopp
+    ```
+	
+	2. **Build for x86_64 Architecture:**
+    ```bash
+    make CXXFLAGS="-arch x86_64"
+    mv libcryptopp.a libcryptopp-x86_64.a
+    make clean
+    ```
+ 3. **Build for arm64 Architecture:**
+    ```bash
+    make CXXFLAGS="-arch arm64"
+    mv libcryptopp.a libcryptopp-arm64.a
+    ```
+ 4. **Create Universal Binary:**
+    ```bash
+    lipo -create libcryptopp-x86_64.a libcryptopp-arm64.a -output libcryptopp-universal.a
+    ```
+ 5. **Link in Xcode:**
+    Add the path to `libcryptopp-universal.a` in Xcode's "Library Search Paths" and the Crypto++ headers in "Header Search Paths."
+    In your build settings, choose "Any Mac (Apple Silicon, Intel)" as the target.
+
+ This process involves compiling the library separately for each architecture and then combining them using the `lipo` tool. This ensures compatibility with all types of Macs.
+
+## Using Precompiled Binaries (recommended)
+
+1. **Download Binaries:**
+    - Download the latest Cryptopia.SkaleGasMiner binaries from the [Release Page](https://github.com/cryptopia-com/skale-gas-miner/releases/) 
+	
+ 2. **Add to Unity Project:**
+    - Copy the `.dll` (for Windows) and/or `.bundle` (for macOS) into your Unity project's `Assets/Plugins` folder.
+	
+ 3. **Use in Unity Scripts:**
+    - Follow the same method as in "Using the DLL in Unity" for calling functions from the binary.
+
+ ## Using the Binaries in Unity
+ 
+ To use the `Cryptopia.SkaleGasMiner` binary in a Unity project, follow these steps:
  
  1. **Import the DLL:**
-    Copy the built `Cryptopia.SkaleGasMiner.dll` file into your Unity project's `Assets/Plugins` folder.
+    Copy the built `Cryptopia.SkaleGasMiner.dll` (or .bundle) files into your Unity project's `Assets/Plugins` folder.
  
  2. **Create a C# Script:**
     In your Unity project, create a C# script to interface with the DLL. Use `[DllImport]` to import the functions from the DLL.
@@ -61,14 +122,14 @@ To build the `SkaleGasMiner` DLL, follow these steps:
 	/// True if mining
 	/// </summary>
 	/// <returns></returns>
-	[DllImport("Cryptopia.SkaleGasMiner.dll", EntryPoint = "IsMining", CallingConvention = CallingConvention.StdCall)]
+	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "IsMining", CallingConvention = CallingConvention.StdCall)]
 	private static extern bool _IsMining();
 
 	/// <summary>
 	/// Get hash rate
 	/// </summary>
 	/// <returns></returns>
-	[DllImport("Cryptopia.SkaleGasMiner.dll", EntryPoint = "GetHashRate", CallingConvention = CallingConvention.StdCall)]
+	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "GetHashRate", CallingConvention = CallingConvention.StdCall)]
 	private static extern ulong _GetHashRate();
 
 	/// <summary>
@@ -81,13 +142,13 @@ To build the `SkaleGasMiner` DLL, follow these steps:
 	/// <param name="hashRateCallback"></param>
 	/// <param name="resultCallback"></param>
 	/// <param name="maxThreads"></param>
-	[DllImport("Cryptopia.SkaleGasMiner.dll", EntryPoint = "MineGas", CallingConvention = CallingConvention.StdCall)]
+	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "MineGas", CallingConvention = CallingConvention.StdCall)]
 	private static extern void _MineGas(ulong amount, string fromAddress, ulong nonce, uint difficulty, HashRateDelegate hashRateCallback, ResultDelegate resultCallback, uint maxThreads = 0);
 
 	/// <summary>
 	/// Stop mining
 	/// </summary>
-	[DllImport("Cryptopia.SkaleGasMiner.dll", EntryPoint = "Stop", CallingConvention = CallingConvention.StdCall)]
+	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "Stop", CallingConvention = CallingConvention.StdCall)]
 	private static extern void _Stop();
     ```
  
@@ -124,9 +185,6 @@ To build the `SkaleGasMiner` DLL, follow these steps:
 	// Wait for the mining operation to complete
 	yield return new WaitUntil(() => isMiningCompleted);
 	```
- 
- 5. **Use the Wrapper in Your Game Scripts:**
-    You can now use `SkaleGasMinerWrapper` in your Unity scripts to control and interact with the mining process.
  
  ## Contributing
  
