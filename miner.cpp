@@ -1,4 +1,3 @@
-#include "pch.h"
 #include <memory>
 #include <algorithm>
 #include "helpers/convert.h"
@@ -173,12 +172,10 @@ namespace Cryptopia
                 new CryptoPP::HexEncoder(
                     new CryptoPP::StringSink(hexString)));
 
-            // Convert to lowercase
-            std::transform(hexString.begin(), hexString.end(), hexString.begin(), ::tolower);
-
             // Calculate externalGas
-            CryptoPP::Integer candidate = HexToInteger(GetSoliditySha3(HexToInteger(hexString)));
-            CryptoPP::Integer result = precomputed ^ candidate;
+            CryptoPP::Integer candidate(("0x" + hexString).c_str());
+            CryptoPP::Integer candidateHash(GetSoliditySha3(candidate).c_str());
+            CryptoPP::Integer result = precomputed ^ candidateHash;
             CryptoPP::Integer externalGas = numerator / result;
 
             // Update hash rate
@@ -191,7 +188,7 @@ namespace Cryptopia
                 {
                     resultFound_ = true;
                     stopRequested_ = true;
-                    SetResult(IntegerToString(HexToInteger(hexString)));
+                    SetResult(IntegerToString(candidate));
                 }
 
                 break;

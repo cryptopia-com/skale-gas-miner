@@ -1,4 +1,3 @@
-#pragma once
 #include <limits.h>
 #include <chrono>
 #include <string>
@@ -55,7 +54,7 @@ namespace Cryptopia
      */
     std::string GetSoliditySha3(const CryptoPP::Integer& val)
     {
-        return GetSoliditySha3(HexToByteArray(IntegerToString(val, 16)));
+        return GetSoliditySha3(IntegerToByteArray(val));
     }
 
     /**

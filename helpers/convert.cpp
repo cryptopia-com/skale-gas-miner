@@ -1,4 +1,3 @@
-#pragma once
 #include <chrono>
 #include <string>
 #include "cryptopp/hex.h"
@@ -11,10 +10,9 @@ namespace Cryptopia
      * Converts a hexadecimal string to a byte array (SecByteBlock).
      *
      * @param hex A string representing a hexadecimal value.
-     *            The string may start with "0x" which will be removed if present.
      * @return A CryptoPP::SecByteBlock which is the byte array representation of the input hex string.
      */
-    CryptoPP::SecByteBlock HexToByteArray(const std::string& hex)
+    CryptoPP::SecByteBlock HexToByteArray(const std::string& hex) 
     {
         std::string cleanHex = hex;
 
@@ -22,6 +20,12 @@ namespace Cryptopia
         if (cleanHex.size() > 1 && cleanHex.substr(0, 2) == "0x") 
         {
             cleanHex = cleanHex.substr(2);
+        }
+
+        // Ensure even length for correct byte array conversion
+        if ((cleanHex.size() % 2) != 0) 
+        {
+            cleanHex = "0" + cleanHex;
         }
 
         // Convert hex string to byte array
@@ -34,14 +38,19 @@ namespace Cryptopia
     }
 
     /**
-     * Converts a hexadecimal string to a CryptoPP::Integer.
-     *
-     * @param hex A string representing a hexadecimal number.
-     * @return A CryptoPP::Integer which is the numeric representation of the input hex string.
+     * Converts a CryptoPP::Integer to a byte array (SecByteBlock).
+     * 
+     * @param integer An CryptoPP::Integer to convert.
+     * @return A CryptoPP::SecByteBlock which is the byte array representation of the input integer.
      */
-    CryptoPP::Integer HexToInteger(const std::string& hex)
+    CryptoPP::SecByteBlock IntegerToByteArray(const CryptoPP::Integer& integer) 
     {
-        return CryptoPP::Integer(("0x" + hex).c_str());
+        // Convert Integer to byte array
+        size_t byteCount = integer.MinEncodedSize();
+        CryptoPP::SecByteBlock byteBlock(byteCount);
+        integer.Encode(byteBlock, byteCount);
+
+        return byteBlock;
     }
 
     /**

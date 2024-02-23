@@ -5,21 +5,20 @@
 namespace Cryptopia 
 {
     /**
-     * Converts a hexadecimal string to a byte array (SecByteBlock).
-     *
-     * @param hex A string representing a hexadecimal value.
-     *            The string may start with "0x" which will be removed if present.
-     * @return A CryptoPP::SecByteBlock which is the byte array representation of the input hex string.
-     */
-    CryptoPP::Integer HexToInteger(const std::string& hex);
-
-    /**
      * Converts a hexadecimal string to a CryptoPP::Integer.
      *
      * @param hex A string representing a hexadecimal number.
      * @return A CryptoPP::Integer which is the numeric representation of the input hex string.
      */
     CryptoPP::SecByteBlock HexToByteArray(const std::string& hex);
+
+    /**
+     * Converts a CryptoPP::Integer to a byte array (SecByteBlock).
+     *
+     * @param integer An CryptoPP::Integer to convert.
+     * @return A CryptoPP::SecByteBlock which is the byte array representation of the input integer.
+     */
+    CryptoPP::SecByteBlock IntegerToByteArray(const CryptoPP::Integer& integer);
 
     /**
      * Converts a CryptoPP::Integer to a string representation.
