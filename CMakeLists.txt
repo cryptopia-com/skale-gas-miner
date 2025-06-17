@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Cryptopia.SkaleGasMiner)
+project(skale_gas_miner)
 
 # =============================
 # NDK path and cpu-features.h
@@ -92,3 +92,5 @@ target_include_directories(skale_gas_miner PRIVATE
     ${CMAKE_SOURCE_DIR}/lib
     ${CMAKE_SOURCE_DIR}/lib/cryptopp
 )
+
+set_target_properties(skale_gas_miner PROPERTIES OUTPUT_NAME "Cryptopia.SkaleMiner")
