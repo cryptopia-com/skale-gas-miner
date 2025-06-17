@@ -1,6 +1,8 @@
 #include <limits.h>
 #include <chrono>
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include "cryptopp/integer.h"
 #include "cryptopp/osrng.h"
 #include "cryptopp/keccak.h"

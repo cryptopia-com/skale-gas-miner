@@ -1,5 +1,7 @@
 #include <chrono>
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include "cryptopp/hex.h"
 #include "cryptopp/integer.h"
 #include "../helpers/convert.h"
