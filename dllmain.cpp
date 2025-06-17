@@ -7,11 +7,11 @@ namespace Cryptopia
 	/**
 	 * Checks if the mining process is currently active.
 	 *
-	 * @return A boolean value indicating whether mining is currently in progress.
+	 * @return An int value indicating whether mining is currently in progress where 1 means mining is active and 0 means it is not.
 	 */
-	extern "C" SKALEGASMINER_API bool IsMining()
+	extern "C" SKALEGASMINER_API int IsMining()
 	{
-		return Cryptopia::SkaleGasMiner::GetInstance().IsMining();
+		return Cryptopia::SkaleGasMiner::GetInstance().IsMining() ? 1 : 0;
 	}
 
 	/**

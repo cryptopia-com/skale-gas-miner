@@ -148,7 +148,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>.\lib\cryptopp\x64\Output\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>.\lib\cryptopp\x64\Output\$(Configuration)\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <Version>0.1.1</Version>
+      <Version>0.2</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
