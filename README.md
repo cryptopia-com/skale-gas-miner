@@ -198,7 +198,7 @@ public class SkaleGasMiner : MonoBehaviour
     private static bool _isMiningActive = false;
 
     [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "IsMining")]
-	private static extern int _IsMining();
+    private static extern int _IsMining();
 
     [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "GetHashRate")]
     private static extern ulong _GetHashRate();
