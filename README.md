@@ -1,3 +1,4 @@
+﻿
 # Cryptopia.SkaleGasMiner
 
 Welcome to the `Cryptopia.SkaleGasMiner` project, a solution for gas mining in Unity3D on the Skale network. This project encapsulates the logic required for efficient mining, offering a minimal API for managing mining processes.
@@ -77,6 +78,66 @@ To build the `SkaleGasMiner` DLL, follow these steps:
 
  This process involves compiling the library separately for each architecture and then combining them using the `lipo` tool. This ensures compatibility with all types of Macs.
 
+## Building for Android
+
+1. **Install Prerequisites:**
+   - Android NDK (r21 or newer)
+   - CMake 3.19+
+   - Ninja (recommended)
+   - Modern C++ compiler (Clang)
+
+2. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/cryptopia-com/skale-gas-miner.git
+   cd skale-gas-miner
+   ```
+
+3. **Set the ANDROID_NDK Environment Variable:**
+   - **Windows:**
+     ```cmd
+     set ANDROID_NDK=C:\Path\To\Android\ndk\XX.X.XXXXX
+     ```
+   - **macOS/Linux:**
+     ```bash
+     export ANDROID_NDK=/path/to/android/ndk/XX.X.XXXXX
+     ```
+
+4. **Build for All Supported ABIs:**
+
+   - **arm64-v8a:**
+     ```bash
+     cmake --preset=android-arm64-v8a
+     cmake --build --preset=android-arm64-v8a
+     ```
+   - **armeabi-v7a:**
+     ```bash
+     cmake --preset=android-armeabi-v7a
+     cmake --build --preset=android-armeabi-v7a
+     ```
+   - **x86:**
+     ```bash
+     cmake --preset=android-x86
+     cmake --build --preset=android-x86
+     ```
+   - **x86_64:**
+     ```bash
+     cmake --preset=android-x86_64
+     cmake --build --preset=android-x86_64
+     ```
+
+   Each build will output `libCryptopia.SkaleMiner.so` to its respective directory, for example:
+   ```
+   build-android/arm64-v8a/libCryptopia.SkaleMiner.so
+   build-android/armeabi-v7a/libCryptopia.SkaleMiner.so
+   build-android/x86/libCryptopia.SkaleMiner.so
+   build-android/x86_64/libCryptopia.SkaleMiner.so
+   ```
+
+5. **Add to Unity:**
+   - Copy each `.so` file to your Unity project's `Assets/Plugins/Android/libs/<abi>/` directory (create folders as needed, e.g., `arm64-v8a`, `armeabi-v7a`, etc.).
+
+
+
 ## Using Precompiled Binaries (recommended)
 
 1. **Download Binaries:**
@@ -84,107 +145,205 @@ To build the `SkaleGasMiner` DLL, follow these steps:
 	
  2. **Add to Unity Project:**
     - Copy the `.dll` (for Windows) and/or `.bundle` (for macOS) into your Unity project's `Assets/Plugins` folder.
+    -   Copy each `.so` file (for Android) to your Unity project's `Assets/Plugins/Android/libs/<abi>/` directory (create folders as needed, e.g., `arm64-v8a`, `armeabi-v7a`, etc.).
 	
  3. **Use in Unity Scripts:**
-    - Follow the same method as in "Using the DLL in Unity" for calling functions from the binary.
+    - Follow the same method as in "Using the Binaries in Unity" for calling functions from the binary.
 
- ## Using the Binaries in Unity
  
- To use the `Cryptopia.SkaleGasMiner` binary in a Unity project, follow these steps:
- 
- 1. **Import the DLL:**
-    Copy the built `Cryptopia.SkaleGasMiner.dll` (or .bundle) files into your Unity project's `Assets/Plugins` folder.
- 
- 2. **Create a C# Script:**
-    In your Unity project, create a C# script to interface with the DLL. Use `[DllImport]` to import the functions from the DLL.
- 
- 3. **Implement Function Wrappers:**
-    Write C# wrapper functions that call the imported DLL functions:
- 
-    ```csharp
-	using System.Runtime.InteropServices;
-	
-    /// <summary>
-	/// Hash rate delegate
-	/// </summary>
-	/// <param name="hashRate"></param>
-	public delegate void HashRateDelegate(ulong hashRate);
+## Using the Binaries in Unity
 
-	/// <summary>
-	/// Response delegate
-	/// </summary>
-	/// <param name="success"></param>
-	/// <param name="result"></param>
-	/// <param name="error"></param>
-	public delegate void ResultDelegate(bool success, string result, string error);
+To use the `Cryptopia.SkaleGasMiner` binary in a Unity project, follow these steps:
 
-	/// <summary>
-	/// True if mining
-	/// </summary>
-	/// <returns></returns>
-	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "IsMining", CallingConvention = CallingConvention.StdCall)]
-	private static extern bool _IsMining();
+1. **Import the Plugin Files:**
+   - Copy the built `Cryptopia.SkaleGasMiner.dll` (Windows), `.bundle` or `.dylib` (macOS), and each `libCryptopia.SkaleMiner.so` (Android) file into your Unity project's `Assets/Plugins` folder.
+   - For Android, place each `.so` file into `Assets/Plugins/Android/libs/<abi>/` (e.g., `arm64-v8a`, `armeabi-v7a`, etc.).
 
-	/// <summary>
-	/// Get hash rate
-	/// </summary>
-	/// <returns></returns>
-	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "GetHashRate", CallingConvention = CallingConvention.StdCall)]
-	private static extern ulong _GetHashRate();
+2. **Create a C# Script:**
+   - In your Unity project, create a C# script to interface with the plugin. Use `[DllImport]` to import the native functions.
 
-	/// <summary>
-	/// Mine gas
-	/// </summary>
-	/// <param name="amount"></param>
-	/// <param name="fromAddress"></param>
-	/// <param name="nonce"></param>
-	/// <param name="difficulty"></param>
-	/// <param name="hashRateCallback"></param>
-	/// <param name="resultCallback"></param>
-	/// <param name="maxThreads"></param>
-	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "MineGas", CallingConvention = CallingConvention.StdCall)]
-	private static extern void _MineGas(ulong amount, string fromAddress, ulong nonce, uint difficulty, HashRateDelegate hashRateCallback, ResultDelegate resultCallback, uint maxThreads = 0);
 
-	/// <summary>
-	/// Stop mining
-	/// </summary>
-	[DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "Stop", CallingConvention = CallingConvention.StdCall)]
-	private static extern void _Stop();
-    ```
- 
-	4. **Call Function Wrappers:**
-	Use the C# wrapper functions. For example:
- 
-    ```csharp
-	bool isMiningCompleted = false;
-	
-	// Start the mining operation
-	Task.Run(() => 
-	{
-		_MineGas(
-			GasAmount,
-			FromAddress,
-			Nonce,
-			Difficulty,
-			(nextHashRate) => 
-			{
-				// Display 'nextHashRate' to player
-			},
-			(success, result, error) =>
-			{
-				if (success)
-				{
-					// Set gas price to 'result'
-				}
+   - For full coroutine and callback safety, use a pattern like the example below. This approach avoids threading issues and is safe for IL2CPP/AOT platforms.
 
-				isMiningCompleted = true;
-			},
-			(uint)_maxConcurrentJobs);
-	});
+```csharp
+using System;
+using System.Collections;
+using System.Runtime.InteropServices;
+using UnityEngine;
 
-	// Wait for the mining operation to complete
-	yield return new WaitUntil(() => isMiningCompleted);
-	```
+// Helper class to carry mining result
+public class ValueResult<T>
+{
+    public bool success;
+    public T value;
+    public string error;
+}
+
+// MonoBehaviour that wraps native plugin calls
+public class SkaleGasMiner : MonoBehaviour
+{
+    // Native delegates
+    public delegate void HashRateDelegate(ulong hashRate);
+    public delegate void ResultDelegate(bool success, string result, string error);
+
+    // Internal static state for bridging native → managed
+    private static bool _isMiningCompleted;
+    private static bool _miningSuccess;
+    private static string _miningResult;
+    private static string _miningError;
+    private static ulong _lastHashRate;
+
+    // Lock to protect native calls (DLL is not thread-safe)
+    private static readonly object _miningLock = new object();
+    private static bool _isMiningActive = false;
+
+    [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "IsMining")]
+    private static extern bool _IsMining();
+
+    [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "GetHashRate")]
+    private static extern ulong _GetHashRate();
+
+    [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "MineGas")]
+    private static extern void _MineGas(
+        ulong amount,
+        string fromAddress,
+        ulong nonce,
+        uint difficulty,
+        HashRateDelegate hashRateCallback,
+        ResultDelegate resultCallback,
+        uint maxThreads = 0);
+
+    [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "Stop")]
+    private static extern void _Stop();
+
+    // IL2CPP/AOT-safe static callback handlers
+    [AOT.MonoPInvokeCallback(typeof(HashRateDelegate))]
+    private static void HandleHashRate(ulong rate)
+    {
+        _lastHashRate = rate;
+        // Optionally: broadcast hash rate update, e.g. event/callback/UI.
+    }
+
+    [AOT.MonoPInvokeCallback(typeof(ResultDelegate))]
+    private static void HandleResult(bool success, string result, string error)
+    {
+        _miningSuccess = success;
+        _miningResult = result;
+        _miningError = error;
+        _isMiningCompleted = true;
+    }
+
+    // Start mining gas. Fills the provided result object when done.
+    // Re-entrancy protection: throws if mining is already active.
+    public IEnumerator MineGas(
+        ulong amount,
+        string fromAddress,
+        ulong nonce,
+        uint difficulty,
+        ValueResult<string> result,
+        uint maxThreads = 8)
+    {
+        lock (_miningLock)
+        {
+            if (_isMiningActive)
+                throw new InvalidOperationException("Mining already in progress. The DLL is not reentrant.");
+
+            _isMiningActive = true;
+        }
+
+        try
+        {
+            _isMiningCompleted = false;
+            _miningSuccess = false;
+            _miningResult = null;
+            _miningError = null;
+            _lastHashRate = 0;
+
+            _MineGas(
+                amount,
+                fromAddress,
+                nonce,
+                difficulty,
+                HandleHashRate,
+                HandleResult,
+                maxThreads);
+
+            yield return new WaitUntil(() => _isMiningCompleted);
+
+            result.success = _miningSuccess;
+            result.value = _miningResult;
+            result.error = _miningError;
+        }
+        finally
+        {
+            lock (_miningLock)
+            {
+                _isMiningActive = false;
+            }
+        }
+    }
+
+    // Returns the last reported hash rate, or zero if none reported yet.
+    public ulong GetLastHashRate() => _lastHashRate;
+
+    // True if mining is in progress.
+    public bool IsMining() => _IsMining();
+
+    // Stop the mining operation.
+    public void Stop() => _Stop();
+}
+```
+
+4. **Call the Miner:**
+
+```csharp
+// Example MonoBehaviour that shows how to start mining and get updates
+public class GasMiningExample : MonoBehaviour
+{
+    public SkaleGasMiner miner;
+
+    void Start()
+    {
+        ulong amount = 1000000;
+        string fromAddress = "0xYourAddressHere";
+        ulong nonce = 1234;
+        uint difficulty = 1;
+        uint maxThreads = 0;
+
+        // Start the mining coroutine
+        StartCoroutine(MineAndReport(amount, fromAddress, nonce, difficulty, maxThreads));
+        // Optionally: start coroutine to monitor hash rate
+        StartCoroutine(MonitorHashRate());
+    }
+
+    private IEnumerator MineAndReport(
+        ulong amount,
+        string fromAddress,
+        ulong nonce,
+        uint difficulty,
+        uint maxThreads)
+    {
+        var result = new ValueResult<string>();
+        yield return StartCoroutine(miner.MineGas(amount, fromAddress, nonce, difficulty, result, maxThreads));
+
+        if (result.success)
+            Debug.Log("Mining succeeded, result (use as gas price): " + result.value);
+        else
+            Debug.LogError("Mining failed: " + result.error);
+    }
+
+    private IEnumerator MonitorHashRate()
+    {
+        // Log hash rate every second while mining is in progress
+        while (miner.IsMining())
+        {
+            ulong hashRate = miner.GetLastHashRate();
+            Debug.Log("Current hash rate: " + hashRate);
+            yield return new WaitForSeconds(1f);
+        }
+    }
+}
+```
  
  ## Contributing
  
