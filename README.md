@@ -233,7 +233,7 @@ public class SkaleGasMiner : MonoBehaviour
         _isMiningCompleted = true;
     }
 
-	// Returns the last reported hash rate (zero if none reported yet).
+    // Returns the last reported hash rate (zero if none reported yet).
     public ulong LastHashRate => _lastHashRate;
 
     // True if mining is in progress.
