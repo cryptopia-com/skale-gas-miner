@@ -107,8 +107,8 @@ target_include_directories(skale_gas_miner PRIVATE
 )
 
 # =============================
-# Set the output name to Cryptopia.SkaleMiner
+# Set the output name to Cryptopia.SkaleGasMiner
 # =============================
 set_target_properties(skale_gas_miner PROPERTIES OUTPUT_NAME 
-    "Cryptopia.SkaleMiner"
+    "Cryptopia.SkaleGasMiner"
 )

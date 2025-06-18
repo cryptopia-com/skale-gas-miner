@@ -198,7 +198,7 @@ public class SkaleGasMiner : MonoBehaviour
     private static bool _isMiningActive = false;
 
     [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "IsMining")]
-    private static extern bool _IsMining();
+	private static extern int _IsMining();
 
     [DllImport("Cryptopia.SkaleGasMiner", EntryPoint = "GetHashRate")]
     private static extern ulong _GetHashRate();
@@ -232,6 +232,15 @@ public class SkaleGasMiner : MonoBehaviour
         _miningError = error;
         _isMiningCompleted = true;
     }
+
+	// Returns the last reported hash rate (zero if none reported yet).
+    public ulong LastHashRate => _lastHashRate;
+
+    // True if mining is in progress.
+    public bool IsMining => _IsMining() != 0;
+
+    // Stop the mining operation.
+    public void Stop() => _Stop();
 
     // Start mining gas. Fills the provided result object when done.
     // Re-entrancy protection: throws if mining is already active.
@@ -282,15 +291,6 @@ public class SkaleGasMiner : MonoBehaviour
             }
         }
     }
-
-    // Returns the last reported hash rate, or zero if none reported yet.
-    public ulong GetLastHashRate() => _lastHashRate;
-
-    // True if mining is in progress.
-    public bool IsMining() => _IsMining();
-
-    // Stop the mining operation.
-    public void Stop() => _Stop();
 }
 ```
 
