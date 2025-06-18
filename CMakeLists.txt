@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.19)
 
 project(skale_gas_miner)
 
 # =============================
-# NDK path and cpu-features.h
+# Ensure ANDROID_NDK is set
 # =============================
 if(NOT DEFINED ANDROID_NDK)
     if(DEFINED ENV{ANDROID_NDK})
@@ -30,7 +30,9 @@ file(GLOB CRYPTOPP_SOURCES
     "${CMAKE_SOURCE_DIR}/lib/cryptopp/*.cpp"
 )
 
+# =============================
 # Remove SIMD and hardware-accelerated files that require special CPU features
+# =============================
 list(REMOVE_ITEM CRYPTOPP_SOURCES
     "${CMAKE_SOURCE_DIR}/lib/cryptopp/gcm_simd.cpp"
     "${CMAKE_SOURCE_DIR}/lib/cryptopp/gf2n_simd.cpp"
@@ -39,8 +41,16 @@ list(REMOVE_ITEM CRYPTOPP_SOURCES
     "${CMAKE_SOURCE_DIR}/lib/cryptopp/sha_simd.cpp"
 )
 
-add_library(cryptopp STATIC ${CRYPTOPP_SOURCES})
+# =============================
+# Add Crypto++ library
+# =============================
+add_library(cryptopp STATIC 
+    ${CRYPTOPP_SOURCES}
+)
 
+# =============================
+# Set compile options for Crypto++
+# =============================
 target_compile_definitions(cryptopp PRIVATE
     CRYPTOPP_DISABLE_ASM
     CRYPTOPP_DISABLE_ARM_NEON
@@ -57,6 +67,9 @@ file(GLOB HELPER_SOURCES
     "${CMAKE_SOURCE_DIR}/helpers/*.cpp"
 )
 
+# ============================
+# Add the main miner library
+# ============================
 add_library(skale_gas_miner SHARED
     miner.cpp
     dllmain.cpp
@@ -93,4 +106,9 @@ target_include_directories(skale_gas_miner PRIVATE
     ${CMAKE_SOURCE_DIR}/lib/cryptopp
 )
 
-set_target_properties(skale_gas_miner PROPERTIES OUTPUT_NAME "Cryptopia.SkaleMiner")
+# =============================
+# Set the output name to Cryptopia.SkaleMiner
+# =============================
+set_target_properties(skale_gas_miner PROPERTIES OUTPUT_NAME 
+    "Cryptopia.SkaleMiner"
+)
