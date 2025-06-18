@@ -294,7 +294,7 @@ public class SkaleGasMiner : MonoBehaviour
 }
 ```
 
-4. **Call the Miner:**
+3. **Call the Miner:**
 
 ```csharp
 // Example MonoBehaviour that shows how to start mining and get updates
